@@ -15,6 +15,6 @@ describe('UserController', () => {
   });
 
   it('should be defined', () => {
-    expect(controller).toBeNull();
+    expect(controller).toBeDefined();
   });
 });
