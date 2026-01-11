@@ -1,44 +1,20 @@
 version: 2.1
-# CircleCI 설정 파일 버전
 
 jobs:
   build-and-test:
-    # CI에서 실행할 하나의 작업(job)
-    # 이 job이 성공/실패 결과를 만들어서 GitHub에 전달함
-
     docker:
       - image: cimg/node:18.19
-      # CI를 실행할 환경(Node.js 18.19가 설치된 공식 CircleCI Docker 이미지)
-
     steps:
       - checkout
-      # GitHub 저장소의 코드를 CI 컨테이너로 가져옴
-
       - run:
           name: Install dependencies
           command: npm install
-          # 프로젝트에 필요한 의존성 설치
-          # 이 단계에서 에러가 나도 job은 실패 처리됨
-
       - run:
           name: Run tests
           command: npm test
-          # 테스트 실행
-          # npm test가 실패하면 exit code 1 반환
-          # --> CircleCI job 실패
-          # --> GitHub에 status check 실패로 전달됨
 
 workflows:
-  build-and-test: # workflow 의 이름임(임의), job 이름이랑 다른거임. job 을 언제 실행할지 결정함
-
+  ci:
     jobs:
       - build-and-test:
-          filters:
-            branches:
-              only: main
-              # main 브랜치에 직접 push되거나 PR이 merge되어 main이 업데이트될 때 CI 실행
-            pull_requests:
-              only: /.*/
-              # 모든 PR에 대해 CI 실행
-              # PR 생성 / PR에 커밋 추가 시 실행됨
-
+          context: org-global
