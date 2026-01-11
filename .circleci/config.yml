@@ -1,33 +1,40 @@
-version: 2.1  # CircleCI 설정 파일 버전 (요즘은 거의 무조건 2.1)
+version: 2.1
+# CircleCI 설정 파일 버전
 
-jobs:         # CI에서 실행할 작업(job) 정의
-  build-and-test:   # job 이름 (마음대로 지어도 됨)
-    docker:         # 이 job을 실행할 환경
-      - image: cimg/node:18.19  # Node.js 18.19가 설치된 CircleCI 공식 Docker 이미지
-    working_directory: ~/repo  # 컨테이너 안에서 작업할 기본 디렉토리
+jobs:
+  build-and-test:
+    # CI에서 실행할 하나의 작업(job)
+    # 이 job이 성공/실패 결과를 만들어서 GitHub에 전달함
 
-    steps:          # job 안에서 순서대로 실행될 단계들
-      - checkout    # GitHub 저장소 코드를 컨테이너로 가져옴 (필수)
+    docker:
+      - image: cimg/node:18.19
+      # CI를 실행할 환경(Node.js 18.19가 설치된 공식 CircleCI Docker 이미지)
 
-      - restore_cache:   # 캐시 복원 (npm install 빠르게 하려고)
-          keys:
-            - v1-deps-{{ checksum "package-lock.json" }} # package-lock.json이 같으면 이 캐시 사용
-            - v1-deps-                                   # 없으면 가장 최근 캐시 사용
-
-      - run:
-          name: Install dependencies   # CircleCI UI에 보일 이름
-          command: npm install         # 의존성 설치
-
-      - save_cache:    # node_modules 캐시 저장
-          paths:
-            - node_modules              # 캐시할 폴더
-          key: v1-deps-{{ checksum "package-lock.json" }} # 캐시 키 (의존성 바뀌면 새로 만듦)
+    steps:
+      - checkout
+      # GitHub 저장소의 코드를 CI 컨테이너로 가져옴
 
       - run:
-          name: Run tests   # 테스트 단계 이름
-          command: npm test # package.json의 test 스크립트 실행
+          name: Install dependencies
+          command: npm install
+          # 프로젝트에 필요한 의존성 설치
+          # 이 단계에서 에러가 나도 job은 실패 처리됨
 
-workflows:            # job을 언제/어떻게 실행할지 정의
-  build-and-test:     # workflow 이름
+      - run:
+          name: Run tests
+          command: npm test
+          # 테스트 실행
+          # npm test가 실패하면 exit code 1 반환
+          # --> CircleCI job 실패
+          # --> GitHub에 status check 실패로 전달됨
+
+workflows:
+  build-and-test: # workflow 의 이름임(임의), job 이름이랑 다른거임. job 을 언제 실행할지 결정함
+
     jobs:
-      - build-and-test  # 위에서 정의한 job 실행
+      - build-and-test:
+          filters:
+            pull_requests:
+              only: /.*/
+            # 모든 PR에 대해서만 job 실행 , PR이 생성되거나 업데이트될 때 CI 실행
+            # 단순 브랜치 push에는 CI 실행 안 함
