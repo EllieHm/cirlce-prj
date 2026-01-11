@@ -28,6 +28,6 @@ jobs:         # CI에서 실행할 작업(job) 정의
           command: npm test # package.json의 test 스크립트 실행
 
 workflows:            # job을 언제/어떻게 실행할지 정의
-  ci:     # workflow 이름
+  build-and-test:     # workflow 이름
     jobs:
       - build-and-test  # 위에서 정의한 job 실행
