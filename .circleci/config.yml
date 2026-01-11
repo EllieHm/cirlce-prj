@@ -34,7 +34,11 @@ workflows:
     jobs:
       - build-and-test:
           filters:
+            branches:
+              only: main
+              # main 브랜치에 직접 push되거나 PR이 merge되어 main이 업데이트될 때 CI 실행
             pull_requests:
               only: /.*/
-            # 모든 PR에 대해서만 job 실행 , PR이 생성되거나 업데이트될 때 CI 실행
-            # 단순 브랜치 push에는 CI 실행 안 함
+              # 모든 PR에 대해 CI 실행
+              # PR 생성 / PR에 커밋 추가 시 실행됨
+
