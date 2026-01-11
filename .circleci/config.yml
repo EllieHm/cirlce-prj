@@ -29,12 +29,7 @@ jobs:
           # --> GitHub에 status check 실패로 전달됨
 
 workflows:
-  ci: # workflow 의 이름임(임의), job 이름이랑 다른거임. job 을 언제 실행할지 결정함
-
-    jobs:
-      - build-and-test:
-          filters:
-            pull_requests:
-              only: /.*/
-            # 모든 PR에 대해서만 job 실행 , PR이 생성되거나 업데이트될 때 CI 실행
-            # 단순 브랜치 push에는 CI 실행 안 함
+  workflows:
+    ci:
+      jobs:
+        - build-and-test
